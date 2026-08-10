@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "prod": "my-favorite-project-id",
+    "default": "my-project-sales-id"
+  },
+  "targets": {},
+  "etags": {}
+}

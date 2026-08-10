@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SemarangLocation {
+  id              String     @id @default(uuid())
+  areaName        String     @map("area_name")
+  latitude        Float
+  longitude       Float
+  defaultRadiusKm Int        @default(5) @map("default_radius_km")
+  landmarks       String     // Stored as JSON stringified array since SQLite lacks array types
+  createdAt       DateTime   @default(now()) @map("created_at")
+  campaigns       Campaign[]
+
+  @@map("semarang_locations")
+}
+
+model Campaign {
+  id                String           @id @default(uuid())
+  title             String
+  carModel          String           @map("car_model")
+  locationId        String           @map("location_id")
+  location          SemarangLocation @relation(fields: [locationId], references: [id])
+  customLatitude    Float?           @map("custom_latitude")
+  customLongitude   Float?           @map("custom_longitude")
+  radiusKm          Int              @default(5) @map("radius_km")
+  dailyBudgetIdr    Int              @map("daily_budget_idr")
+  headline          String
+  caption           String
+  mediaUrl          String           @map("media_url")
+  metaCampaignId    String?          @map("meta_campaign_id")
+  metaAdsetId       String?          @map("meta_adset_id")
+  metaAdId          String?          @map("meta_ad_id")
+  status            String           @default("DRAFT")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  leads             Lead[]
+
+  @@map("campaigns")
+}
+
+model Lead {
+  id                 String    @id @default(uuid())
+  campaignId         String?   @map("campaign_id")
+  campaign           Campaign? @relation(fields: [campaignId], references: [id])
+  customerName       String    @map("customer_name")
+  customerPhone      String    @map("customer_phone")
+  districtArea       String?   @map("district_area")
+  notes              String?
+  waNotificationSent Boolean   @default(false) @map("wa_notification_sent")
+  status             String    @default("NEW")
+  rawPayload         String?   // Stored as JSON stringified object
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  @@map("leads")
+}
