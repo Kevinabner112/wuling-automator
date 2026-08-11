@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { sendNewLeadAlert } from "@/lib/wa_notifier"
 
 export async function POST(req: Request) {
   try {
@@ -11,18 +12,33 @@ export async function POST(req: Request) {
     const districtArea = data.entry?.[0]?.changes?.[0]?.value?.form_data?.city || "Semarang"
     const campaignId = data.entry?.[0]?.changes?.[0]?.value?.campaign_id || null
 
-    const lead = await prisma.lead.create({
+    let lead = await prisma.lead.create({
       data: {
         customerName,
         customerPhone,
         districtArea,
         campaignId,
         status: "NEW"
+      },
+      include: {
+        campaign: true
       }
     })
 
-    // Mock WhatsApp notification
-    console.log(`[WA GATEWAY MOCK] Sent WhatsApp notification to Sales: "New Lead received: ${customerName} (${customerPhone}) from ${districtArea}!"`)
+    // Send WhatsApp notification
+    const waSuccess = await sendNewLeadAlert({
+      customerName: lead.customerName,
+      customerPhone: lead.customerPhone,
+      districtArea: lead.districtArea || "Semarang",
+      carModel: lead.campaign?.carModel
+    })
+
+    if (waSuccess) {
+      await prisma.lead.update({
+        where: { id: lead.id },
+        data: { waNotificationSent: true }
+      })
+    }
 
     return NextResponse.json({ success: true, leadId: lead.id })
   } catch (error) {
