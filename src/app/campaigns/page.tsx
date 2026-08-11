@@ -45,14 +45,14 @@ export default async function CampaignsPage() {
               <TableBody>
                 {campaigns.map((c) => (
                   <TableRow key={c.id}>
-                    <TableCell className="font-medium">{c.name}</TableCell>
+                    <TableCell className="font-medium">{c.title}</TableCell>
                     <TableCell>{c.carModel}</TableCell>
                     <TableCell>
                       <Badge variant={c.status === 'ACTIVE' ? 'default' : 'secondary'} className={c.status === 'ACTIVE' ? 'bg-green-600 hover:bg-green-700 text-white' : ''}>
                         {c.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>Rp {c.dailyBudget.toLocaleString('id-ID')}</TableCell>
+                    <TableCell>Rp {c.dailyBudgetIdr.toLocaleString('id-ID')}</TableCell>
                     <TableCell>{new Date(c.createdAt).toLocaleDateString()}</TableCell>
                   </TableRow>
                 ))}
