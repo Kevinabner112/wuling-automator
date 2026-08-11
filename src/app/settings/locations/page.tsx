@@ -9,11 +9,12 @@ export default async function LocationsPage() {
       orderBy: { areaName: 'asc' }
     })
 
-    // Serialize decimals to string for Client Component
+    // Serialize decimals to string for Client Component and parse landmarks
     const serializedLocations = locations.map(loc => ({
       ...loc,
       latitude: loc.latitude.toString(),
-      longitude: loc.longitude.toString()
+      longitude: loc.longitude.toString(),
+      landmarks: loc.landmarks ? JSON.parse(loc.landmarks) : []
     }))
 
     return (

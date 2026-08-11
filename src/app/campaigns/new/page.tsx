@@ -8,6 +8,11 @@ export default async function NewCampaignPage() {
     orderBy: { areaName: 'asc' }
   })
 
+  const serializedLocations = locations.map(loc => ({
+    ...loc,
+    landmarks: loc.landmarks ? JSON.parse(loc.landmarks) : []
+  }))
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
@@ -15,7 +20,7 @@ export default async function NewCampaignPage() {
         <p className="text-muted-foreground">Launch a new geo-targeted Meta ad campaign.</p>
       </div>
       
-      <CampaignWizard locations={locations} />
+      <CampaignWizard locations={serializedLocations} />
     </div>
   )
 }
