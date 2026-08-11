@@ -1,18 +1,26 @@
 import { NextResponse } from "next/server"
+import { deployToMeta } from "@/lib/meta_ads"
 
 export async function POST(req: Request) {
   try {
-    const { locationId, carModel, budget, headline, caption, radiusKm } = await req.json()
+    const { locationId, carModel, budget, headline, caption, radiusKm, customLatitude, customLongitude } = await req.json()
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // Deploy to Meta (if credentials exist, otherwise it falls back to mock inside the function)
+    const result = await deployToMeta({
+      headline,
+      caption,
+      carModel,
+      budget,
+      radiusKm,
+      latitude: customLatitude || -7.0535, // default to some coordinate if missing
+      longitude: customLongitude || 110.4285
+    })
 
-    // Mock successful Meta API response
     return NextResponse.json({
       success: true,
-      campaignId: `cmp_${Math.random().toString(36).substring(7)}`,
-      adSetId: `ads_${Math.random().toString(36).substring(7)}`,
-      adId: `ad_${Math.random().toString(36).substring(7)}`,
+      campaignId: result.campaignId,
+      adSetId: result.adSetId,
+      adId: result.adId,
       message: "Successfully deployed to Meta Ads"
     })
   } catch (error) {

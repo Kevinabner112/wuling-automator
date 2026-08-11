@@ -39,7 +39,8 @@ export async function GET(req: Request) {
   const challenge = searchParams.get("hub.challenge")
 
   if (mode && token) {
-    if (mode === "subscribe" && token === "my_custom_verify_token") {
+    const verifyToken = process.env.META_WEBHOOK_VERIFY_TOKEN || "wuling_semarang_secure_token_123"
+    if (mode === "subscribe" && token === verifyToken) {
       return new NextResponse(challenge, { status: 200 })
     }
     return new NextResponse("Forbidden", { status: 403 })
